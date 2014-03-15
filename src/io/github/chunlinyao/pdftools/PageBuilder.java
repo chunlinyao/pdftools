@@ -11,6 +11,7 @@ public class PageBuilder {
 
 	public PageBuilder(final PDF pdf) {
 		this.pdf = pdf;
+		this.pdf.closeCurrentPage();
 		pdf.getDoc().newPage();
 	}
 
@@ -36,6 +37,14 @@ public class PageBuilder {
 
 	public PdfWriter getWriter() {
 		return pdf.getWriter();
+	}
+
+	public float mmToPt(float mm) {
+		return PdfUtility.mmToPt(mm);
+	}
+
+	public float[] mmToPt(float[] mm) {
+		return PdfUtility.mmToPt(mm);
 	}
 
 	void done() {

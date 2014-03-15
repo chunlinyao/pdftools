@@ -86,7 +86,10 @@ public class PdfToolsTest {
 										.addCell(
 												"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
 										.color(Color.red);
-								currentTable().addRow(20).addCell("simplexxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+								currentTable()
+										.addRow(20)
+										.addCell(
+												"simplexxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
 										.colSpan(2);
 								currentTable().table.getDefaultCell()
 										.setBorder(Rectangle.NO_BORDER);

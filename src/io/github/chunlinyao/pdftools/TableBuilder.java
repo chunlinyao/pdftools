@@ -129,6 +129,14 @@ public class TableBuilder implements PdfElement, Iterable<RowBuilder> {
 		written = true;
 	}
 
+	public float mmToPt(float mm) {
+		return PdfUtility.mmToPt(mm);
+	}
+
+	public float[] mmToPt(float[] mm) {
+		return PdfUtility.mmToPt(mm);
+	}
+
 	private void draw2(PdfContentByte directContent) {
 		table.writeSelectedRows(0, -1, x, y, directContent);
 	}

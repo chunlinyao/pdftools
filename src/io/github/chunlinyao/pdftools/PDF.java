@@ -74,11 +74,7 @@ public class PDF {
 	}
 
 	public float[] mmToPt(float[] mm) {
-		float[] ret = new float[mm.length];
-		for (int i = 0; i < mm.length; i++) {
-			ret[i] = mmToPt(mm[i]);
-		}
-		return ret;
+		return PdfUtility.mmToPt(mm);
 	}
 
 	Document getDoc() {
@@ -113,7 +109,7 @@ public class PDF {
 	/**
 	 * 
 	 */
-	private void closeCurrentPage() {
+	void closeCurrentPage() {
 		if (currentPage != null) {
 			currentPage.done();
 		}

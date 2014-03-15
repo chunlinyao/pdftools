@@ -15,6 +15,14 @@ public class PdfUtility {
 		return mm * 10.0f / 254.0f * 72.0f;
 	}
 
+	public static float[] mmToPt(float[] mm) {
+		float[] ret = new float[mm.length];
+		for (int i = 0; i < mm.length; i++) {
+			ret[i] = mmToPt(mm[i]);
+		}
+		return ret;
+	}
+
 	public static float translateY(final float y) {
 		return PageSize.A4.getHeight() - mmToPt(y);
 	}
