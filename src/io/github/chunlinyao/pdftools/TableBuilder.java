@@ -26,7 +26,7 @@ public class TableBuilder implements PdfElement, Iterable<RowBuilder> {
 	private RowBuilder currentRow;
 	private final List<RowBuilder> rows = new ArrayList<>();
 
-	Font font = new Font(PdfUtility.getSimsun(), 12f);
+	Font font = new Font(PdfUtility.getFzSongTi(), 12f);
 	Color color;
 
 	public TableBuilder(final PageBuilder page, final float[] widths) {

@@ -65,7 +65,9 @@ public class PDF {
 	}
 
 	public void done() {
-		currentPage().done();
+		if (currentPage() != null) {
+			currentPage().done();
+		}
 		getDoc().close();
 	}
 

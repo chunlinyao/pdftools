@@ -26,7 +26,7 @@ public class LabelBuilder implements PdfElement {
 	public LabelBuilder(final PageBuilder page, final String text) {
 		this.page = page;
 		this.text = Phrase.getInstance(16, text,
-				new Font(PdfUtility.getSimsun(), 12f));
+				new Font(PdfUtility.getFzSongTi(), 12f));
 		this.table = new PdfPTable(new float[] { 1 });
 		if (Boolean.getBoolean("pdf.test")) {
 			getDefaultCell().setBorderColor(Color.red);
