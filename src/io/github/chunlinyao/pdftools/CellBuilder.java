@@ -2,8 +2,10 @@ package io.github.chunlinyao.pdftools;
 
 import java.awt.Color;
 
+import com.lowagie.text.Chunk;
 import com.lowagie.text.Font;
 import com.lowagie.text.Phrase;
+import com.lowagie.text.pdf.Barcode;
 import com.lowagie.text.pdf.PdfPCell;
 
 public class CellBuilder extends CellProps {
@@ -13,6 +15,7 @@ public class CellBuilder extends CellProps {
 
 	int colSpan = 1;
 	int rowSpan = 1;
+	boolean barcode = false;
 
 	public CellBuilder(final RowBuilder rowBuilder, final String text) {
 		super(rowBuilder);
@@ -74,12 +77,16 @@ public class CellBuilder extends CellProps {
 		return padding(padding, padding, padding, padding);
 	}
 
-	public CellBuilder padding(final float top, final float right,
-			final float bottom, final float left) {
+	public CellBuilder padding(final float top, final float right, final float bottom, final float left) {
 		paddingLeft = left;
 		paddingRight = right;
 		paddingTop = top;
 		paddingBottom = bottom;
+		return this;
+	}
+
+	public CellBuilder barcode() {
+		barcode = true;
 		return this;
 	}
 
@@ -97,6 +104,28 @@ public class CellBuilder extends CellProps {
 	 * @return
 	 */
 	protected PdfPCell createPdfCell(RowBuilder row, PdfPCell defaultCell) {
+		return barcode ? createBarcodeCell(row, defaultCell) : createTextCell(row, defaultCell);
+	}
+
+	/**
+	 * @param row
+	 * @param defaultCell
+	 * @return
+	 */
+	private PdfPCell createBarcodeCell(RowBuilder row, PdfPCell defaultCell) {
+		final Barcode barcode = PdfUtility.createCode128(text);
+		defaultCell.setPhrase(new Phrase(new Chunk(barcode.createImageWithBarcode(row.getDirectContent(), color, color), 0, 0)));
+		final PdfPCell ret = new PdfPCell(row.getTable().getDefaultCell());
+		defaultCell.setPhrase(null);
+		return ret;
+	}
+
+	/**
+	 * @param row
+	 * @param defaultCell
+	 * @return
+	 */
+	private PdfPCell createTextCell(RowBuilder row, PdfPCell defaultCell) {
 		final Phrase phrase = createPhraseWithFont();
 		defaultCell.setPhrase(phrase);
 		final PdfPCell ret = new PdfPCell(row.getTable().getDefaultCell());
@@ -114,6 +143,9 @@ public class CellBuilder extends CellProps {
 		}
 		if (noWrap != null) {
 			ret.setNoWrap(noWrap);
+		}
+		if (barcode) {
+			ret.setNoWrap(true);
 		}
 		if (paddingLeft != null) {
 			ret.setPaddingLeft(paddingLeft);

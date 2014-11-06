@@ -1,4 +1,3 @@
-
 package io.github.chunlinyao.pdftools;
 
 import java.awt.Color;
@@ -7,7 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.lowagie.text.Font;
-
+import com.lowagie.text.pdf.PdfContentByte;
 
 public class RowBuilder extends CellProps implements Iterable<CellBuilder> {
 
@@ -103,4 +102,7 @@ public class RowBuilder extends CellProps implements Iterable<CellBuilder> {
 		return table;
 	}
 
+	PdfContentByte getDirectContent() {
+		return table.getDirectContent();
+	}
 }

@@ -5,8 +5,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import com.lowagie.text.Chunk;
 import com.lowagie.text.DocumentException;
 import com.lowagie.text.Font;
+import com.lowagie.text.Image;
 import com.lowagie.text.pdf.ColumnText;
 import com.lowagie.text.pdf.ExtraHeightGetter;
 import com.lowagie.text.pdf.PdfContentByte;
@@ -73,8 +75,7 @@ public class TableBuilder implements PdfElement, Iterable<RowBuilder> {
 		return padding(padding, padding, padding, padding);
 	}
 
-	public TableBuilder padding(final float top, final float right,
-			final float bottom, final float left) {
+	public TableBuilder padding(final float top, final float right, final float bottom, final float left) {
 		getDefaultCell().setPaddingLeft(left);
 		getDefaultCell().setPaddingRight(right);
 		getDefaultCell().setPaddingTop(top);
@@ -123,8 +124,7 @@ public class TableBuilder implements PdfElement, Iterable<RowBuilder> {
 			return;
 		}
 		layout();
-		final PdfContentByte directContent = page.getWriter()
-				.getDirectContent();
+		final PdfContentByte directContent = getDirectContent();
 		draw2(directContent);
 		written = true;
 	}
@@ -156,8 +156,7 @@ public class TableBuilder implements PdfElement, Iterable<RowBuilder> {
 	@SuppressWarnings("unused")
 	private void draw1(PdfContentByte directContent) {
 		ColumnText ct = new ColumnText(directContent);
-		ct.setSimpleColumn(x, y - table.getTotalHeight() - 0.001f,
-				x + table.getTotalWidth(), y);
+		ct.setSimpleColumn(x, y - table.getTotalHeight() - 0.001f, x + table.getTotalWidth(), y);
 		ct.addElement(table);
 		try {
 			ct.go();
@@ -186,16 +185,59 @@ public class TableBuilder implements PdfElement, Iterable<RowBuilder> {
 			float[] extraHeights = ExtraHeightGetter.getExtraHeights(lastRow);
 			for (int i = 0; i < lastRow.getCells().length; i++) {
 				final PdfPCell pdfCell = lastRow.getCells()[i];
-				if (pdfCell != null && pdfCell.getPhrase() != null) {
-					new ShrinkTextHelper(pdfCell.isNoWrap())
-							.shrintTextToFitCell(pdfCell, extraHeights[i]
-									+ lastRow.getMaxHeights(),
-									pdfCell.getPhrase());
-					pdfCell.setPhrase(pdfCell.getPhrase());
-				}
+				if (pdfCell != null)
+					if (pdfCell.getPhrase() != null) {
+						if (isBarcodeCell(pdfCell)) {
+							// Image cell
+							scaleBarcode(pdfCell);
+						} else {
+							// text cell
+							new ShrinkTextHelper(pdfCell.isNoWrap()).shrintTextToFitCell(pdfCell, extraHeights[i] + lastRow.getMaxHeights(), pdfCell.getPhrase());
+							pdfCell.setPhrase(pdfCell.getPhrase());
+						}
+					}
 			}
 			lastRow.setWidths(table.getAbsoluteWidths());
 		}
+	}
+
+	private void scaleBarcode(PdfPCell pdfCell) {
+		Image img = getImageFromCell(pdfCell);
+		img.scalePercent(100);
+		float refWidth = img.getScaledWidth();
+		float refHeight = img.getScaledHeight();
+		float scaleW = (pdfCell.getRight() - pdfCell.getEffectivePaddingRight() - pdfCell.getEffectivePaddingLeft() - pdfCell.getLeft()) / refWidth;
+
+		float scaleH = (pdfCell.getMaxHeight() - pdfCell.getEffectivePaddingTop() - pdfCell.getEffectivePaddingBottom()) / refHeight;
+		img.scalePercent(Math.min(1, Math.min(scaleW, scaleH)) * 100);
+	}
+
+	/**
+	 * 判断是不是条码的
+	 * 
+	 * @param pdfCell
+	 */
+	private boolean isBarcodeCell(PdfPCell pdfCell) {
+		Image image = getImageFromCell(pdfCell);
+		if (image != null) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * @param pdfCell
+	 * @return
+	 */
+	Image getImageFromCell(PdfPCell pdfCell) {
+		ArrayList<?> chunks = pdfCell.getPhrase().getChunks();
+		if (chunks.isEmpty()) {
+			return null;
+		}
+		Chunk ck = (Chunk) chunks.get(0);
+		Image image = ck.getImage();
+		return image;
 	}
 
 	/**
@@ -226,4 +268,10 @@ public class TableBuilder implements PdfElement, Iterable<RowBuilder> {
 		return this.table.getDefaultCell();
 	}
 
+	/**
+	 * @return
+	 */
+	PdfContentByte getDirectContent() {
+		return page.getWriter().getDirectContent();
+	}
 }

@@ -17,6 +17,7 @@ public class PageBuilder {
 
 	public PageBuilder(final PDF pdf, final Rectangle pageSize) {
 		this.pdf = pdf;
+		this.pdf.closeCurrentPage();
 		pdf.getDoc().setPageSize(pageSize);
 		pdf.getDoc().newPage();
 	}
@@ -25,7 +26,10 @@ public class PageBuilder {
 		setCurrent(new LabelBuilder(this, text));
 		return (LabelBuilder) current();
 	}
-
+	public BarcodeBuilder barcode(final String text) {
+		setCurrent(new BarcodeBuilder(this, text));
+		return (BarcodeBuilder) current();
+	}
 	public TableBuilder table(final float[] widths) {
 		setCurrent(new TableBuilder(this, widths));
 		return (TableBuilder) current();
